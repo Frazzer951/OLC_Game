@@ -10,13 +10,23 @@ private:
   float fBatPos   = 20.0f;
   float fBatWidth = 40.0f;
 
-  olc::vf2d vBall = { 200.0f, 200.0f };
+  olc::vf2d vBall     = { 200.0f, 200.0f };
+  float     fBatSpeed = 0.1f;
 
 public:
   bool OnUserCreate() override { return true; }
 
   bool OnUserUpdate( float fElapsedTime ) override
   {
+    // Handle User Input
+    if( GetKey( olc::Key::LEFT ).bHeld ) fBatPos -= fBatSpeed;
+    if( GetKey( olc::Key::RIGHT ).bHeld ) fBatPos += fBatSpeed;
+    if( fBatPos < 11.0f ) fBatPos = 11.0f;
+    if( fBatPos + fBatWidth > float( ScreenWidth() ) - 10.0f ) fBatPos = float( ScreenWidth() ) - 10.0f - fBatWidth;
+
+    // Cheat! Moving the Ball with Mouse
+    if( GetMouse( 0 ).bHeld ) { vBall = { float( GetMouseX() ), float( GetMouseY() ) }; }
+
     // Erase previous frame
     Clear( olc::DARK_BLUE );
 

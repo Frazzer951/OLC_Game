@@ -7,14 +7,16 @@ public:
   BreakOut() { sAppName = "TUTORIAL - BreakOut Clone"; }
 
 private:
-  float                  fBatPos     = 20.0f;
-  float                  fBatWidth   = 40.0f;
-  olc::vf2d              vBallPos    = { 0.0f, 0.0f };
-  olc::vf2d              vBallDir    = { 0.0f, 0.0f };
-  float                  fBallSpeed  = 20.0f;
-  float                  fBallRadius = 5.0f;
-  float                  fBatSpeed   = 250.0f;
-  olc::vi2d              vBlockSize  = { 16, 16 };
+  float fBatPos   = 20.0f;
+  float fBatWidth = 40.0f;
+  float fBatSpeed = 250.0f;
+
+  olc::vf2d vBallPos    = { 0.0f, 0.0f };
+  olc::vf2d vBallDir    = { 0.0f, 0.0f };
+  float     fBallSpeed  = 20.0f;
+  float     fBallRadius = 5.0f;
+
+  olc::vi2d              vBlockSize = { 16, 16 };
   std::unique_ptr<int[]> blocks;
 
   std::unique_ptr<olc::Sprite> sprTile;
@@ -45,12 +47,12 @@ public:
     fAngle       = -0.4f;
     vBallDir     = { cos( fAngle ), sin( fAngle ) };
     vBallPos     = { 12.5f, 15.5f };
-
     return true;
   }
 
   bool OnUserUpdate( float fElapsedTime ) override
   {
+    // A better collision detection
     // Calculate where ball should be, if no collision
     olc::vf2d vPotentialBallPos = vBallPos + vBallDir * fBallSpeed * fElapsedTime;
 
@@ -59,7 +61,8 @@ public:
 
     auto TestResolveCollisionPoint = [&]( const olc::vf2d & point ) {
       olc::vi2d vTestPoint = vPotentialBallPos + vTileBallRadialDims * point;
-      auto &    tile       = blocks[vTestPoint.y * 24 + vTestPoint.x];
+
+      auto & tile = blocks[vTestPoint.y * 24 + vTestPoint.x];
       if( tile == 0 )
       {
         // Do Nothing, no collision
@@ -84,6 +87,7 @@ public:
     bHasHitTile |= TestResolveCollisionPoint( olc::vf2d( -1, 0 ) );
     bHasHitTile |= TestResolveCollisionPoint( olc::vf2d( +1, 0 ) );
 
+    // Fake Floor
     if( vBallPos.y > 20.0f ) vBallDir.y *= -1.0f;
 
     // Actually update ball position with modified direction
@@ -131,7 +135,6 @@ public:
 
     // Draw Ball
     FillCircle( vBallPos * vBlockSize, fBallRadius, olc::CYAN );
-
     return true;
   }
 };
@@ -139,6 +142,6 @@ public:
 int main()
 {
   BreakOut demo;
-  if( demo.Construct( 512, 480, 2, 2 ) ) demo.Start();
+  if( demo.Construct( 512, 480, 1, 1 ) ) demo.Start();
   return 0;
 }

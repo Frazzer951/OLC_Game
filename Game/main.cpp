@@ -10,12 +10,17 @@ private:
   float fBatPos   = 20.0f;
   float fBatWidth = 40.0f;
 
-  olc::vf2d vBall     = { 200.0f, 200.0f };
-  olc::vf2d vBallVel  = { 200.0f, -200.0f };
-  float     fBatSpeed = 250.0f;
+  olc::vf2d vBall       = { 200.0f, 200.0f };
+  olc::vf2d vBallVel    = { 200.0f, -100.0f };
+  float     fBatSpeed   = 250.0f;
+  float     fBallRadius = 5.0f;
 
 public:
-  bool OnUserCreate() override { return true; }
+  bool OnUserCreate() override
+  {
+    srand( 100 );
+    return true;
+  }
 
   bool OnUserUpdate( float fElapsedTime ) override
   {
@@ -38,18 +43,16 @@ public:
     if( vBall.y >= ( float( ScreenHeight() ) - 20.0f ) && ( vBall.x > fBatPos ) && ( vBall.x < fBatPos + fBatWidth ) )
       vBallVel.y *= -1.0f;
 
+
     // Check if ball has gone off screen
     if( vBall.y > ScreenHeight() )
     {
-      // Reset Ball Location
+      // Reset ball location
       vBall = { 200.0f, 200.0f };
       // Choose Random direction
       float fAngle = ( float( rand() ) / float( RAND_MAX ) ) * 2.0f * 3.14159f;
       vBallVel     = { 300.0f * cos( fAngle ), 300.0f * sin( fAngle ) };
     }
-
-    // Cheat! Moving the Ball with Mouse
-    if( GetMouse( 0 ).bHeld ) { vBall = { float( GetMouseX() ), float( GetMouseY() ) }; }
 
     // Erase previous frame
     Clear( olc::DARK_BLUE );
@@ -63,8 +66,7 @@ public:
     FillRect( int( fBatPos ), ScreenHeight() - 20, int( fBatWidth ), 10, olc::GREEN );
 
     // Draw Ball
-    FillCircle( vBall, 5, olc::CYAN );
-
+    FillCircle( vBall, int( fBallRadius ), olc::CYAN );
     return true;
   }
 };

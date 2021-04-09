@@ -11,7 +11,8 @@ private:
   float fBatWidth = 40.0f;
 
   olc::vf2d vBall     = { 200.0f, 200.0f };
-  float     fBatSpeed = 0.1f;
+  olc::vf2d vBallVel  = { 200.0f, -200.0f };
+  float     fBatSpeed = 250.0f;
 
 public:
   bool OnUserCreate() override { return true; }
@@ -19,10 +20,33 @@ public:
   bool OnUserUpdate( float fElapsedTime ) override
   {
     // Handle User Input
-    if( GetKey( olc::Key::LEFT ).bHeld ) fBatPos -= fBatSpeed;
-    if( GetKey( olc::Key::RIGHT ).bHeld ) fBatPos += fBatSpeed;
+    if( GetKey( olc::Key::LEFT ).bHeld ) fBatPos -= fBatSpeed * fElapsedTime;
+    if( GetKey( olc::Key::RIGHT ).bHeld ) fBatPos += fBatSpeed * fElapsedTime;
+
     if( fBatPos < 11.0f ) fBatPos = 11.0f;
     if( fBatPos + fBatWidth > float( ScreenWidth() ) - 10.0f ) fBatPos = float( ScreenWidth() ) - 10.0f - fBatWidth;
+
+    // Update Ball
+    vBall += vBallVel * fElapsedTime;
+
+    // Really crude arena detection - this approach sucks
+    if( vBall.y <= 10.0f ) vBallVel.y *= -1.0f;
+    if( vBall.x <= 10.0f ) vBallVel.x *= -1.0f;
+    if( vBall.x >= float( ScreenWidth() ) - 10.0f ) vBallVel.x *= -1.0f;
+
+    // Check Bat
+    if( vBall.y >= ( float( ScreenHeight() ) - 20.0f ) && ( vBall.x > fBatPos ) && ( vBall.x < fBatPos + fBatWidth ) )
+      vBallVel.y *= -1.0f;
+
+    // Check if ball has gone off screen
+    if( vBall.y > ScreenHeight() )
+    {
+      // Reset Ball Location
+      vBall = { 200.0f, 200.0f };
+      // Choose Random direction
+      float fAngle = ( float( rand() ) / float( RAND_MAX ) ) * 2.0f * 3.14159f;
+      vBallVel     = { 300.0f * cos( fAngle ), 300.0f * sin( fAngle ) };
+    }
 
     // Cheat! Moving the Ball with Mouse
     if( GetMouse( 0 ).bHeld ) { vBall = { float( GetMouseX() ), float( GetMouseY() ) }; }
